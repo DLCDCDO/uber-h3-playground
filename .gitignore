@@ -29,4 +29,4 @@ yarn.lock
 package-lock.json
 
 # WSL Stuff
-*.Zone.Identifier
+*:Zone.Identifier

@@ -6,29 +6,22 @@ import "@arcgis/map-components/components/arcgis-zoom";
 import "@arcgis/map-components/components/arcgis-legend";
 import "@arcgis/map-components/components/arcgis-search";
 
-// Uber h3-js
-import {latLngToCell, cellToBoundary} from "h3-js";
+// Uber h3-js Stuff
+import { cellToBoundary } from "h3-js";
 
 // Core API import
 import Graphic from "@arcgis/core/Graphic.js";
 
-console.log(`latLngToCell::`, latLngToCell);
-
 const viewElement = document.querySelector("arcgis-map");
 
-viewElement.addEventListener("arcgisViewReadyChange", (event) => {
-});
+viewElement.addEventListener("arcgisViewReadyChange", async () => {
+  // Parquet Stuff
+  const { asyncBufferFromUrl, parquetReadObjects } = await import('hyparquet');
+  const file = await asyncBufferFromUrl({ url: './hexes.parquet' });
+  const data = await parquetReadObjects({ file });
 
-viewElement.addEventListener("arcgisViewReadyChange", () => {
-  viewElement.addEventListener('arcgisViewClick', (evt) => {
-    const { detail : { mapPoint: { latitude, longitude } }} = evt;
-    const h3Index = latLngToCell(latitude, longitude, 9);
-    console.log('latitude::', latitude);
-    console.log('longitude::', longitude);
-    console.log('h3Index::', h3Index);
-    // Add Cell as Graphic
-    const boundary = cellToBoundary(h3Index, true);
-    console.log('boundary::', boundary);
+  data.forEach(hex => {
+    const boundary = cellToBoundary(hex.index, true);
     // Create a polygon geometry
     const polygon = {
       type: "polygon", // autocasts as new Polygon()
@@ -55,3 +48,4 @@ viewElement.addEventListener("arcgisViewReadyChange", () => {
     viewElement.graphics.add(polygonGraphic)
   })
 });
+

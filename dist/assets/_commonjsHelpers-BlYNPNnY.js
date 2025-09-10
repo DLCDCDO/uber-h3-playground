@@ -1,0 +1,1 @@
+import{bq as o}from"./index-tVDMIqXw.js";var n=typeof globalThis<"u"?globalThis:typeof window<"u"?window:typeof o<"u"?o:typeof self<"u"?self:{};function t(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}export{n as e,t as o};

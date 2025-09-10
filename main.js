@@ -17,7 +17,8 @@ const viewElement = document.querySelector("arcgis-map");
 viewElement.addEventListener("arcgisViewReadyChange", async () => {
   // Parquet Stuff
   const { asyncBufferFromUrl, parquetReadObjects } = await import('hyparquet');
-  const file = await asyncBufferFromUrl({ url: './hexes.parquet?raw=true' });
+  // github pages having issue with file.... use raw githubusercontent
+  const file = await asyncBufferFromUrl({ url: 'https://raw.githubusercontent.com/DLCDCDO/uber-h3-playground/main/dist/hexes.parquet' });
   const data = await parquetReadObjects({ file });
 
   data.forEach(hex => {

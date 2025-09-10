@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build && cp hexes.parquet ./dist/hexes.parquet",
     "preview": "vite preview",
-    "write": "node ./parquet_writer/index.js"
+    "write": "node ./parquet_writer/index.js && cp ./parquet_writer/hexes.parquet ./hexes.parquet"
   },
   "dependencies": {
     "@arcgis/core": "~4.33.0",

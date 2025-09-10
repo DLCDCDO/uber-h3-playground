@@ -17,7 +17,7 @@ const viewElement = document.querySelector("arcgis-map");
 viewElement.addEventListener("arcgisViewReadyChange", async () => {
   // Parquet Stuff
   const { asyncBufferFromUrl, parquetReadObjects } = await import('hyparquet');
-  const file = await asyncBufferFromUrl({ url: './hexes.parquet' });
+  const file = await asyncBufferFromUrl({ url: './hexes.parquet?raw=true' });
   const data = await parquetReadObjects({ file });
 
   data.forEach(hex => {

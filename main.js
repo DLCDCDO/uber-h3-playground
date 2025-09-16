@@ -51,16 +51,8 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
         name: "grid_id",
         type: "oid",
       },
-      {
-        name: "ugb_pct_rank",
-        type: "double"
-      },
-      {
-        name: "region_pct_rank",
-        type: "double"
-      },
-      {
-        name: "st_pct_rank",
+      { 
+        name: "final_value",
         type: "double"
       }
     ],
@@ -92,14 +84,26 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
       symbol: fillSymbol,
       attributes: {
         grid_id: hex,
-        ugb_pct_rank: hexStore[hex][0]['ugb_pct_rank'],
-        region_pct_rank: hexStore[hex][0]['region_pct_rank'],
-        st_pct_rank: hexStore[hex][0]['st_pct_rank']
+        final_value: 0.0
       }
     });
-    
     graphics.push(polygonGraphic);
   });
   hexLayer.source = graphics;
+
+  setInterval(() => {
+    const edits = [];
+    hexLayer.queryFeatures().then((results) => {
+      results.features.forEach((feature) => {
+        feature.setAttribute('final_value', Math.random());
+        edits.push(feature);
+      })
+    }).then(() => {
+      hexLayer.applyEdits({
+        updateFeatures: edits
+      })
+      
+    })
+  }, 5000)
 });
 

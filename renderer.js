@@ -6,30 +6,30 @@ const defaultSym = {
         width: "0.5px",
     },
 };
-export const generateRenderer =  (field = "ugb_pct_rank") => {
+export const generateRenderer =  (field = "final_value") => {
     return {
         type: "simple", // autocasts as new SimpleRenderer()
         symbol: defaultSym,
         label: "UGB Percent Rank",
         visualVariables: [
             {
-            type: "color",
-            field,
-            legendOptions: {
-                title: "UGB Percent Rank",
-            },
-            stops: [
-                {
-                value: 0,
-                color: "#FFFCD4",
-                label: "0",
+                type: "color",
+                field,
+                legendOptions: {
+                    title: "UGB Percent Rank",
                 },
-                {
-                value: 1,
-                color: "#350242",
-                label: "1",
-                },
-            ],
+                stops: [
+                    {
+                    value: 0,
+                    color: "#FFFCD4",
+                    label: "0",
+                    },
+                    {
+                    value: 1,
+                    color: "#350242",
+                    label: "1",
+                    },
+                ],
             },
         ],
     };

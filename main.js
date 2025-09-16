@@ -21,6 +21,7 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
   // Parquet Stuff
   const { asyncBufferFromUrl, parquetQuery } = await import('hyparquet');
   // github pages having issue with file.... use raw githubusercontent
+  console.log("ENV::", import.meta.env);
   const prefix = import.meta.env.VITE_PATH;
   const file = await asyncBufferFromUrl({ url: `${prefix}/portland.parquet` });
 

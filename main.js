@@ -1,5 +1,6 @@
 import "./styles.css";
-import { generateRenderer } from './renderer.js'
+import { generateRenderer } from './renderer.js';
+import { calculateValue } from './calculate.js';
 
 // Individual imports for each component
 import "@arcgis/map-components/components/arcgis-map";
@@ -46,10 +47,19 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
   const graphics = [];
   const hexLayer = new FeatureLayer({
     objectIdField: 'grid_id',
+    popupEnabled: true,
+    popupTemplate: {
+      outFields: ['*'],
+      content: `{final_value}` 
+    },
     fields: [
       {
         name: "grid_id",
         type: "oid",
+      },
+      {
+        name: "hex_id",
+        type: "string"
       },
       { 
         name: "final_value",
@@ -84,6 +94,7 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
       symbol: fillSymbol,
       attributes: {
         grid_id: hex,
+        hex_id: hex,
         final_value: 0.0
       }
     });
@@ -91,19 +102,17 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
   });
   hexLayer.source = graphics;
 
-  setInterval(() => {
-    const edits = [];
-    hexLayer.queryFeatures().then((results) => {
-      results.features.forEach((feature) => {
-        feature.setAttribute('final_value', Math.random());
-        edits.push(feature);
-      })
-    }).then(() => {
-      hexLayer.applyEdits({
-        updateFeatures: edits
-      })
-      
+  const edits = [];
+  hexLayer.queryFeatures().then((results) => {
+    results.features.forEach((feature) => {
+      feature.setAttribute('final_value', calculateValue('ugb_pct_rank', hexStore[feature.getAttribute('hex_id')]));
+      edits.push(feature);
     })
-  }, 5000)
+  }).then(() => {
+    hexLayer.applyEdits({
+      updateFeatures: edits
+    });
+    
+  })
 });
 

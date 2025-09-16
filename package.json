@@ -1,0 +1,25 @@
+{
+  "name": "map-components-vite-sample",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && mkdir ./dist/data && cp ./data/* ./dist/data/",
+    "preview": "vite preview",
+    "write": "node ./parquet_writer/index.js && cp ./parquet_writer/data/*.parquet ./data/"
+  },
+  "dependencies": {
+    "@arcgis/core": "~4.33.0",
+    "@arcgis/map-components": "~4.33.0",
+    "@esri/calcite-components": "^3.2.1",
+    "h3-js": "^4.3.0",
+    "hyparquet": "^1.17.8",
+    "hysnappy": "^1.0.0"
+  },
+  "devDependencies": {
+    "@dsnp/parquetjs": "^1.8.7",
+    "papaparse": "^5.5.3",
+    "vite": "^6.3.5",
+    "vite-plugin-node-polyfills": "^0.24.0"
+  }
+}

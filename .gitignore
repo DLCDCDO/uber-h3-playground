@@ -35,4 +35,3 @@ package-lock.json
 data/**/*
 parquet_writer/data/**/*
 *.csv
-hexes.parquet

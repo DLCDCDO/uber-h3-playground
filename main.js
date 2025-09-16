@@ -50,7 +50,7 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
     popupEnabled: true,
     popupTemplate: {
       outFields: ['*'],
-      content: `{final_value}` 
+      content: `value: {final_value}` 
     },
     fields: [
       {

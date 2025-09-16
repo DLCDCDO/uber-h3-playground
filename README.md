@@ -8,6 +8,11 @@ This project was originally created from Esri's VITE starter files.
 
 ## Getting Started
 
+Setup
+```
+npm i
+```
+
 Write parquet files (requires adding harms_assets.csv file manually)
 ```
 npm run write

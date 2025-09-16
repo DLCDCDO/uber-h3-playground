@@ -21,8 +21,9 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
   // Parquet Stuff
   const { asyncBufferFromUrl, parquetQuery } = await import('hyparquet');
   // github pages having issue with file.... use raw githubusercontent
+  const prefix = import.meta.env.PREFIX;
   // const file = await asyncBufferFromUrl({ url: 'https://raw.githubusercontent.com/DLCDCDO/uber-h3-playground/main/dist/data/statewide.parquet' });
-  const file = await asyncBufferFromUrl({ url: './data/portland.parquet' });
+  const file = await asyncBufferFromUrl({ url: `${prefix}/portland.parquet` });
 
   const _data = await parquetQuery({
     file,
@@ -100,19 +101,5 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
     graphics.push(polygonGraphic);
   });
   hexLayer.source = graphics;
-
-  const listEls = document.querySelectorAll('.options-list > li');
-  for (const el of listEls) {
-    el.addEventListener('click', e => {
-      const { target: { innerHTML: text } } = e;
-      if (text === 'UGB') {
-        hexLayer.renderer = generateRenderer('ugb_pct_rank');
-      } else if (text === "REGION") {
-        hexLayer.renderer = generateRenderer('region_pct_rank');
-      } else if (text === "STATE") {
-        hexLayer.renderer = generateRenderer('st_pct_rank');
-      }
-    })
-  }
 });
 

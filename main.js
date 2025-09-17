@@ -52,7 +52,7 @@ viewElement.addEventListener("arcgisViewReadyChange", async () => {
       outFields: ['*'],
       content: (feature) => {
         const { graphic: { attributes }} = feature;
-        return `Value: ${attributes['final_value'].toFixed(4)}`
+        return `Harms Value: ${attributes['final_value'].toFixed(4)}`
       } 
     },
     fields: [

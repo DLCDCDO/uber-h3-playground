@@ -6,7 +6,7 @@ const defaultSym = {
         width: "0.5px",
     },
 };
-export const generateRenderer =  (field = "final_value") => {
+export const generateRenderer =  (field = "final_value_assets") => {
     return {
         type: 'simple', // autocasts as new SimpleRenderer()
         symbol: defaultSym,

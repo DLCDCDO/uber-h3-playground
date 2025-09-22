@@ -19,7 +19,10 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
             assetsValue += row[field];
         }
     });
-    return harmsValue / 12;
+    return {
+    avg_harms: harmsValue / 12,
+    avg_assets: assetsValue / 12
+    };
 };
 
 export { calculateValue };

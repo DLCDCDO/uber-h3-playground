@@ -30,18 +30,14 @@ export async function loadHexData(parquetFile) {
   //build a store for accessing pctranks by indicator name
   //used to compute thresholds for indicators
   // in the future, these calculations should be done while creating the parquet files for performance
-  const indicatorStore ={};
   _data.forEach(d => {
     const id = d['grid_id'];
-    const indicator = d['var'];
-    if (!indicatorStore[indicator]) indicatorStore[indicator] = [];
-    indicatorStore[indicator].push(d['ugb_pct_rank']);
-
+    
     if (!hexStore[id]) hexStore[id] = [];
     hexStore[id].push(d);
   });
 
   const uniqueHexes = Object.keys(hexStore);
 
-  return { hexStore, uniqueHexes, indicatorStore };
+  return { hexStore, uniqueHexes};
 }

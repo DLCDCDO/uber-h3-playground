@@ -56,31 +56,20 @@ export function createHexLayer(uniqueHexes) {
  * @param {FeatureLayer} hexLayer - The FeatureLayer created by createHexLayer.
  * @param {Object<string, Object[]>} hexStore - Map of hex_id → array of data rows.
  */
-export async function updateHexValues(hexLayer, hexStore, indicatorThresholds) {
-  const const_harms = []
-  const const_assets = []
+export async function updateHexValues(hexLayer, hexStore) {
+
   const results = await hexLayer.queryFeatures();
   const edits = results.features.map(feature => {
     const hexId = feature.getAttribute('hex_id');
-    const values = calculateValue('ugb_pct_rank', hexStore[hexId], indicatorThresholds);
+    const values = calculateValue('ugb_pct_rank', hexStore[hexId]);
 
     feature.setAttribute('final_value_harms', values.avg_harms);
     feature.setAttribute('final_value_assets', values.avg_assets);
     feature.setAttribute('compositeKey', values.quartile_string);
     feature.setAttribute('displayString', values.displayString);
-    const_harms.push(values.avg_harms)
-    const_assets.push(values.avg_assets)
-
-
- 
 
     return feature;
   });
-
-  const harms_thresholds = getQuartileThresholds(const_harms)
-  const assets_thresholds = getQuartileThresholds(const_assets)
-  console.log("Harms thresholds:", harms_thresholds)
-  console.log("Assets thresholds:", assets_thresholds)
 
 
   await hexLayer.applyEdits({ updateFeatures: edits });

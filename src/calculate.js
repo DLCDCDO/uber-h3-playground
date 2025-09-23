@@ -2,20 +2,6 @@
 // as well as the main calculation function that returns a string to inform the rendering of the map
 
 /**
- * 
- * @param {object} indicatorStore 
- * @returns {object} indicatorThresholds
- */
-
-export function build_indicator_thresholds(indicatorStore) {
-  const indicatorThresholds = {};
-  for (const [indicator, values] of Object.entries(indicatorStore)) {
-    console.log(`${values}`);
-    indicatorThresholds[indicator] = getQuartileThresholds(values);
-  }
-  return indicatorThresholds;
-}
-/**
  * Calculate quartile thresholds for a given array of numeric values.
  *
  * <p>This function should be used if you want to bin variables into quartiles. (an equal number of values in each bin).
@@ -42,6 +28,7 @@ function getQuartileThresholds(values) {
   };
 }
 export { getQuartileThresholds };
+
 /**
  * assign a bin (1-4) for a value based on provided thresholds
  * 
@@ -88,7 +75,7 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
     "region_pct_rank": 0.17423281073570251,
     "st_pct_rank": 0.3077784776687622,
     "type": "harm"
-}], indicatorThresholds) => {
+}]) => {
     
   // Calculate average values for harms and assets
   //dynamic variable for division in case some entry is missing a harm/asset

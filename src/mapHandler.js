@@ -35,14 +35,15 @@ export function createHexLayer(uniqueHexes) {
     popupTemplate: {
       outFields: ['*'],
       content: (feature) =>
-        `Assets Value: ${feature.graphic.attributes.final_value_assets.toFixed(4)}`
+        `${feature.graphic.attributes.displayString}, ${feature.graphic.attributes.compositeKey}, ${feature.graphic.attributes.final_value_assets}, ${feature.graphic.attributes.final_value_harms}`
     },
     fields: [
       { name: "grid_id", type: "oid" },
       { name: "hex_id", type: "string" },
       { name: "final_value_harms", type: "double"},
       { name: "final_value_assets", type: "double"},
-      { name: "compositeKey", type: "string" }
+      { name: "compositeKey", type: "string" },
+      { name: "displayString", type: "string" }
     ],
     renderer: generateRenderer(),
     source: graphics
@@ -66,6 +67,7 @@ export async function updateHexValues(hexLayer, hexStore, indicatorThresholds) {
     feature.setAttribute('final_value_harms', values.avg_harms);
     feature.setAttribute('final_value_assets', values.avg_assets);
     feature.setAttribute('compositeKey', values.quartile_string);
+    feature.setAttribute('displayString', values.displayString);
     const_harms.push(values.avg_harms)
     const_assets.push(values.avg_assets)
 

@@ -1,8 +1,20 @@
 // this file contains functions to calculate quartiles and assign bins
 // as well as the main calculation function that returns a string to inform the rendering of the map
 
+/**
+ * 
+ * @param {object} indicatorStore 
+ * @returns {object} indicatorThresholds
+ */
 
-
+export function build_indicator_thresholds(indicatorStore) {
+  const indicatorThresholds = {};
+  for (const [indicator, values] of Object.entries(indicatorStore)) {
+    console.log(`${values}`);
+    indicatorThresholds[indicator] = getQuartileThresholds(values);
+  }
+  return indicatorThresholds;
+}
 /**
  * Calculate quartile thresholds for a given array of numeric values.
  *
@@ -13,16 +25,23 @@
  * @return {{q1: number, q2: number, q3: number}} returns an object with q1, q2, and q3 properties representing the quartile thresholds
  * 
  */
-export function getQuartileThresholds(values) {
-  const sorted = [...values].sort((a, b) => a - b);
-  const n = values.length;
+function getQuartileThresholds(values) {
+  const sorted = [...values].sort((a,b)=>a-b);
+  const n = sorted.length;
+  const quartile = (p) => {
+    const idx = (n - 1) * p;
+    const lower = Math.floor(idx);
+    const upper = Math.ceil(idx);
+    if (lower === upper) return sorted[lower];
+    return sorted[lower] + (sorted[upper] - sorted[lower]) * (idx - lower);
+  };
   return {
-    q1: sorted[Math.floor(0.25 * n)],
-    q2: sorted[Math.floor(0.5 * n)],
-    q3: sorted[Math.floor(0.75 * n)]
+    q1: quartile(0.25),
+    q2: quartile(0.5),
+    q3: quartile(0.75)
   };
 }
-
+export { getQuartileThresholds };
 /**
  * assign a bin (1-4) for a value based on provided thresholds
  * 
@@ -44,8 +63,8 @@ function assignBin(value, thresholds) {
 // I've tried calculating dynamic thresholds (from both individual parameters, and averages for harms/assets 
 // but the map looks closest to the example with these static thresholds)
 
-const harms_thresholds = {q1:0.25,q2: 0.5,q3: 0.75};
-const assets_thresholds = {q1:0.25,q2: 0.5,q3: 0.75};
+const fixed_thresholds = {q1:.25,q2:.5,q3:.75};
+
 
 
 /**
@@ -69,7 +88,7 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
     "region_pct_rank": 0.17423281073570251,
     "st_pct_rank": 0.3077784776687622,
     "type": "harm"
-}]) => {
+}], indicatorThresholds) => {
     
   // Calculate average values for harms and assets
   //dynamic variable for division in case some entry is missing a harm/asset
@@ -78,32 +97,43 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
     
     let harmsCount = 0;
     let assetsCount = 0;
+
+    let displayString = '';
     rows.forEach((row) => {
         if (["tsunami_zone", "highway", "electric_transmission_lines"].includes(row.var)) {
     return; // skip this iteration
     }
 
+
+
         if (row.type==='harm') {
-            harmsValue += row[field];
+            const quartileValue = assignBin(row[field], fixed_thresholds);
+            harmsValue +=  row[field];
             harmsCount += 1;
+            displayString += `${row.var}: ${quartileValue} (${row.type})<br>`;
+
         } else {
+            const quartileValue = assignBin(row[field], fixed_thresholds);
             assetsValue += row[field];
             assetsCount += 1;
+            displayString += `${row.var}: ${quartileValue} (${row.type})<br>`;
+
         }
     
 
 });
-    const avg_harms = harmsValue / harmsCount;
-    const avg_assets = assetsValue / assetsCount;
+    const avg_harms = (harmsValue / harmsCount);
+    const avg_assets = (assetsValue / assetsCount);
 
+    console.log(`Avg Harms: ${avg_harms}, Avg Assets: ${avg_assets}`);
 
-
-    const quartile_string = `${assignBin(avg_assets, assets_thresholds)},${assignBin(avg_harms, harms_thresholds)}`;
+    const quartile_string = `${assignBin(avg_assets, fixed_thresholds)},${assignBin(avg_harms, fixed_thresholds)}`;
     
     return {
     avg_harms,
     avg_assets,
-    quartile_string
+    quartile_string,
+    displayString
     };
 };
 

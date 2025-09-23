@@ -8,7 +8,13 @@ const defaultSym = {
 };
 
 
-// Renderer
+/**
+ * generates a unique value renderer for the hex layer based on the compositeKey attribute.
+ * the compositeKey is a string like "1,3" that indicates the bin for assets and harms.
+ * 
+ * @param {string} field the field to use for unique value rendering. should be "compositeKey" to match the feature attribute set in updateHexValues. ( see mapHandler.js)
+ * @returns {object} renderer object for use in FeatureLayer
+ */
 export const generateRenderer = (field = "compositeKey") => {
   return {
     type: "unique-value",

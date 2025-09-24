@@ -5,7 +5,7 @@ import Graphic from "@arcgis/core/Graphic.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
 import { cellToBoundary } from "h3-js";
 import { generateRenderer } from './renderer.js';
-import { calculateValue, getQuartileThresholds } from './calculate.js';
+import { calculateValue} from './calculate.js';
 
 
 /**
@@ -51,7 +51,7 @@ export function createHexLayer(uniqueHexes) {
 }
 
 /**
- * Update the `final_value` attribute of each hex in the given FeatureLayer.
+ * Update the attribute of each hex in the given FeatureLayer.
  *
  * @param {FeatureLayer} hexLayer - The FeatureLayer created by createHexLayer.
  * @param {Object<string, Object[]>} hexStore - Map of hex_id → array of data rows.

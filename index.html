@@ -4,13 +4,56 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Uber H3 Playground</title>
+    <script type="module" src="https://js.arcgis.com/calcite-components/3.3.0/calcite.esm.js"></script>
   </head>
   <body>
-    <arcgis-map  basemap="satellite" center="-122.6687, 45.5003" zoom="12">
-      <arcgis-zoom position="top-left"></arcgis-zoom>
-      <arcgis-search position="top-right"></arcgis-search>
-      <arcgis-legend position="bottom-left"></arcgis-legend>
-    </arcgis-map>
+    <div>
+      <!-- Header Row -->
+      <div id="header">
+        <h1 class="title">OHNA Scoring</h1>
+      </div>
+      <!-- Filters Row -->
+      <div id="filters" class="filters-container">
+        <div id="indicators-filter">
+          <h2>Indicators</h2>
+          <calcite-combobox id="indicator-combobox" placeholder="Indicators">
+            <!-- Populate with indicators -->
+          </calcite-combobox>
+        </div>
+        <div id="place-filter">
+          <h2>Place</h2>
+          <calcite-combobox id="place-combobox" placeholder="Select a UGB" selection-mode="single">
+            <!-- <calcite-combobox-item value="Natural Resources" heading="Natural Resources"></calcite-combobox-item> -->
+            <!-- Populate with place names -->
+          </calcite-combobox> 
+        </div>
+        <div id="comparison-region">
+          <h2>Comparison Region</h2>
+          <calcite-radio-button-group name="Options" layout="horizontal">
+            <calcite-label layout="inline">
+                <calcite-radio-button value="UGB" checked></calcite-radio-button>
+                UGB
+            </calcite-label>
+            <calcite-label layout="inline">
+                <calcite-radio-button value="Region"></calcite-radio-button>
+                Region
+            </calcite-label>
+            <calcite-label layout="inline">
+                <calcite-radio-button value="State"></calcite-radio-button>
+                State
+            </calcite-label>
+        </calcite-radio-button-group>
+        </div>
+      </div>
+      <!-- Main Row (map) -->
+      <div id="main">
+        <arcgis-map  basemap="streets-navigation-vector" center="-122.6687, 45.5003" zoom="12">
+          <arcgis-zoom position="top-left"></arcgis-zoom>
+          <arcgis-search position="top-right"></arcgis-search>
+          <arcgis-legend position="bottom-left"></arcgis-legend>
+        </arcgis-map>
+      </div>
+    </div>
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>

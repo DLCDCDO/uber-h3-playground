@@ -84,7 +84,7 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
     const avg_harms = (harmsValue / harmsCount);
     const avg_assets = (assetsValue / assetsCount);
 
-    console.log(`Avg Harms: ${avg_harms}, Avg Assets: ${avg_assets}`);
+    // console.log(`Avg Harms: ${avg_harms}, Avg Assets: ${avg_assets}`);
 
     const quartile_string = `${assignBin(avg_assets, fixed_thresholds)},${assignBin(avg_harms, fixed_thresholds)}`;
     

@@ -9,9 +9,20 @@ body {
   margin: 0;
 }
 
+.filters-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+#main {
+  height: 500px;
+}
+
 arcgis-map {
   display: block;
-  height: 100vh;
+  height: 100%;
 }
 
 #options {

@@ -27,7 +27,15 @@ Papa.parse(csvFile, {
 });
 
 async function createParquetFile (data) {
-    const schema = new ParquetSchema({
+    // Stores assets and harms for UI dropdown filter
+    const harms_assets = {
+        "asset": new Set(),
+        "harm": new Set(),
+        "flag": new Set(),
+    };
+    // stores place names for UI dropdown filter
+    const places = new Set();
+    const hex_schema = new ParquetSchema({
         grid_id: { type: 'UTF8', compression: 'SNAPPY' },
         value: { type: 'FLOAT', compression: 'SNAPPY' },
         var: { type: 'UTF8', compression: 'SNAPPY' },
@@ -39,9 +47,16 @@ async function createParquetFile (data) {
         st_pct_rank: { type: 'FLOAT', compression: 'SNAPPY' },
         type: { type: 'UTF8', compression: 'SNAPPY' },
     });
+    const harms_assets_schema = new ParquetSchema({
+        type: { type: 'UTF8', compression: 'SNAPPY' },
+        value: { type: 'UTF8', compression: 'SNAPPY' }
+    });
+    const places_schema = new ParquetSchema({
+        name: { type: 'UTF8', compression: 'SNAPPY' }
+    });
 
     const writers = {};
-    const openWriter = async (instName) => {
+    const openWriter = async (instName, schema = hex_schema) => {
         if (!writers[instName]) {
             writers[instName] = await ParquetWriter.openFile(
                 schema, 
@@ -51,9 +66,10 @@ async function createParquetFile (data) {
         return writers[instName];
     };
 
-    // test sample data
     for (const d of data) {
         if (d['GRID_ID'] === null ) { continue; }
+        harms_assets[d['type']].add(d['var']); // add asset, harm, or flag var
+        places.add(d['instName']);
         const writer = await openWriter(d['instName']);
         await writer.appendRow({
             grid_id: d['GRID_ID'], // make INT64
@@ -66,6 +82,25 @@ async function createParquetFile (data) {
             region_pct_rank: d['region_pct_rank'],
             st_pct_rank: d['st_pct_rank'],
             type: d['type']
+        });
+    }
+
+    // Writers unique to harms_assets and places
+    writers['harms_assets'] = await openWriter('harms_assets', harms_assets_schema);
+    writers['places'] = await openWriter('places', places_schema);
+    // Write harms, assets, and flags
+    for (const type of Object.keys(harms_assets)) {
+        for (const value of harms_assets[type]) {
+            await writers['harms_assets'].appendRow({
+                type,
+                value 
+            });
+        }
+    }
+    // Write places
+    for (const place of places) {
+        await writers['places'].appendRow({
+            name: place
         });
     }
 

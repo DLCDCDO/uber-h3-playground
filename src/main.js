@@ -12,9 +12,10 @@ import "@arcgis/map-components/components/arcgis-search";
 const viewElement = document.querySelector("arcgis-map");
 
 viewElement.addEventListener("arcgisViewReadyChange", async () => {
-  const { hexStore, uniqueHexes } = await loadHexData('portland.parquet');
+  const { hexStore, uniqueHexes} = await loadHexData('portland.parquet');
 
   const hexLayer = createHexLayer(uniqueHexes);
   viewElement.map.add(hexLayer);
+
 
   await updateHexValues(hexLayer, hexStore);})

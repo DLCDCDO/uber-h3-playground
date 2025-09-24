@@ -35,14 +35,15 @@ export function createHexLayer(uniqueHexes) {
     popupTemplate: {
       outFields: ['*'],
       content: (feature) =>
-        `Assets Value: ${feature.graphic.attributes.final_value_assets.toFixed(4)}`
+        `${feature.graphic.attributes.displayString}, ${feature.graphic.attributes.compositeKey}, ${feature.graphic.attributes.final_value_assets}, ${feature.graphic.attributes.final_value_harms}`
     },
     fields: [
       { name: "grid_id", type: "oid" },
       { name: "hex_id", type: "string" },
       { name: "final_value_harms", type: "double"},
       { name: "final_value_assets", type: "double"},
-      { name: "compositeKey", type: "string" }
+      { name: "compositeKey", type: "string" },
+      { name: "displayString", type: "string" }
     ],
     renderer: generateRenderer(),
     source: graphics
@@ -55,30 +56,20 @@ export function createHexLayer(uniqueHexes) {
  * @param {FeatureLayer} hexLayer - The FeatureLayer created by createHexLayer.
  * @param {Object<string, Object[]>} hexStore - Map of hex_id → array of data rows.
  */
-export async function updateHexValues(hexLayer, hexStore, indicatorThresholds) {
-  const const_harms = []
-  const const_assets = []
+export async function updateHexValues(hexLayer, hexStore) {
+
   const results = await hexLayer.queryFeatures();
   const edits = results.features.map(feature => {
     const hexId = feature.getAttribute('hex_id');
-    const values = calculateValue('ugb_pct_rank', hexStore[hexId], indicatorThresholds);
+    const values = calculateValue('ugb_pct_rank', hexStore[hexId]);
 
     feature.setAttribute('final_value_harms', values.avg_harms);
     feature.setAttribute('final_value_assets', values.avg_assets);
     feature.setAttribute('compositeKey', values.quartile_string);
-    const_harms.push(values.avg_harms)
-    const_assets.push(values.avg_assets)
-
-
- 
+    feature.setAttribute('displayString', values.displayString);
 
     return feature;
   });
-
-  const harms_thresholds = getQuartileThresholds(const_harms)
-  const assets_thresholds = getQuartileThresholds(const_assets)
-  console.log("Harms thresholds:", harms_thresholds)
-  console.log("Assets thresholds:", assets_thresholds)
 
 
   await hexLayer.applyEdits({ updateFeatures: edits });

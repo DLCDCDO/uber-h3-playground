@@ -27,13 +27,17 @@ export async function loadHexData(parquetFile) {
 
   // Build hexStore keyed by grid_id
   const hexStore = {};
+  //build a store for accessing pctranks by indicator name
+  //used to compute thresholds for indicators
+  // in the future, these calculations should be done while creating the parquet files for performance
   _data.forEach(d => {
     const id = d['grid_id'];
+    
     if (!hexStore[id]) hexStore[id] = [];
     hexStore[id].push(d);
   });
 
   const uniqueHexes = Object.keys(hexStore);
 
-  return { hexStore, uniqueHexes };
+  return { hexStore, uniqueHexes};
 }

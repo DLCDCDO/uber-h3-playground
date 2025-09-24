@@ -27,6 +27,7 @@ async function createPlaceElements(parentEl, cb) {
         file,
         compressors: { SNAPPY: snappyUncompressor() }
     });
+
     const place_names = _data.map(val => val.name).sort();
     const els = place_names.map(place => {
         // <calcite-combobox-item
@@ -67,6 +68,31 @@ async function createPlaceElements(parentEl, cb) {
  * @returns {Promise<void>} 
  *          Resolves once the Parquet data has been loaded.
  */
+
+
+function createElementsHelper(_data, type, group){
+    const filtered = _data.filter(d => d.type === type);
+
+    const var_names = filtered.map(val => val.value).sort(); 
+      // find the groups inside the combobox
+    
+
+
+    const els = var_names.map(vals => {
+        // <calcite-combobox-item
+        //  value="Natural Resources"
+        //  heading="Natural Resources">
+        // </calcite-combobox-item>
+        const el = document.createElement('calcite-combobox-item');
+        el.setAttribute('value', vals);
+        el.setAttribute('heading', vals);
+        return el;
+    });
+    els.forEach(el => {
+        group.append(el)});
+   
+}
+
 async function createIndicatorElements(parentEl) {
     const { asyncBufferFromUrl, parquetQuery } = await import('hyparquet');
     const prefix = import.meta.env.VITE_PATH;
@@ -75,6 +101,21 @@ async function createIndicatorElements(parentEl) {
         file,
         compressors: { SNAPPY: snappyUncompressor() }
     });
+    console.log(_data)
+
+    const harmsGroup = parentEl.querySelector('calcite-combobox-item-group[label="Harms"]');
+    const assetsGroup = parentEl.querySelector('calcite-combobox-item-group[label="Assets"]');
+    createElementsHelper(_data, "asset", assetsGroup)
+    createElementsHelper(_data, 'harm', harmsGroup)
+    parentEl.addEventListener('calciteComboboxChange', () => {
+        if (parentEl.selectedItems.length > 0) {
+            const value = parentEl.selectedItems[0].value.replaceAll(/[ /]/g, "_").toLowerCase();
+            cb(value);
+        } else {
+            cb(null)
+        }
+    })
 }
+
 
 export { createPlaceElements, createIndicatorElements };

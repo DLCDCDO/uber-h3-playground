@@ -18,6 +18,10 @@
           <h2>Indicators</h2>
           <calcite-combobox id="indicator-combobox" placeholder="Indicators">
             <!-- Populate with indicators -->
+          <calcite-combobox-item-group label ="Assets">
+          </calcite-combobox-item-group>
+          <calcite-combobox-item-group label ="Harms">
+          </calcite-combobox-item-group>
           </calcite-combobox>
         </div>
         <div id="place-filter">
@@ -45,6 +49,8 @@
         </calcite-radio-button-group>
         </div>
       </div>
+
+      
       <!-- Main Row (map) -->
       <div id="main">
         <arcgis-map  basemap="streets-navigation-vector" center="-122.6687, 45.5003" zoom="12">

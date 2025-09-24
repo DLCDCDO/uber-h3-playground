@@ -2,34 +2,6 @@
 // as well as the main calculation function that returns a string to inform the rendering of the map
 
 /**
- * Calculate quartile thresholds for a given array of numeric values.
- *
- * <p>This function should be used if you want to bin variables into quartiles. (an equal number of values in each bin).
- * .</p>
- *
- * @param {double[]} values an array of numeric values (could be averages of multiple variables, or a single variable)
- * @return {{q1: number, q2: number, q3: number}} returns an object with q1, q2, and q3 properties representing the quartile thresholds
- * 
- */
-function getQuartileThresholds(values) {
-  const sorted = [...values].sort((a,b)=>a-b);
-  const n = sorted.length;
-  const quartile = (p) => {
-    const idx = (n - 1) * p;
-    const lower = Math.floor(idx);
-    const upper = Math.ceil(idx);
-    if (lower === upper) return sorted[lower];
-    return sorted[lower] + (sorted[upper] - sorted[lower]) * (idx - lower);
-  };
-  return {
-    q1: quartile(0.25),
-    q2: quartile(0.5),
-    q3: quartile(0.75)
-  };
-}
-export { getQuartileThresholds };
-
-/**
  * assign a bin (1-4) for a value based on provided thresholds
  * 
  * This function is called to assign a bin number for assets and harms, which is then used to create a string like "1,3" that informs the rendering of the map.

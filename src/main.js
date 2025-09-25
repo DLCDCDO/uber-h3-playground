@@ -9,6 +9,23 @@ import "@arcgis/map-components/components/arcgis-zoom";
 import "@arcgis/map-components/components/arcgis-legend";
 import "@arcgis/map-components/components/arcgis-search";
 
+
+let indicators = null;
+
+createIndicatorElements(
+  document.querySelector('#indicator-combobox'),
+   (val) => {
+    if (val) {
+      indicators = val
+    } else {
+      indicators = null
+    }
+  }
+);
+
+
+
+
 // Dropdowns
 createPlaceElements(
   document.querySelector('#place-combobox'),
@@ -20,9 +37,7 @@ createPlaceElements(
     }
   }
 );
-createIndicatorElements(
-  document.querySelector('#indicator-combobox')
-);
+
 
 // When the map loads, create a layer from the hexagons. THEN, update the values of each hexagon.
 const viewElement = document.querySelector("arcgis-map");
@@ -31,15 +46,27 @@ const viewElement = document.querySelector("arcgis-map");
 // });
 
 async function selectCity(fileName) {
-  const { hexStore, uniqueHexes} = await loadHexData(fileName);
 
-  const hexLayer = createHexLayer(uniqueHexes);
+
+
+  if(!indicators){
+    console.log("no indicators selected")
+
+  }
+
+  const indicators_set = new Set(indicators);
+
+  console.log(`INDICATORS: ${indicators_set}`)
+ 
+  const { hexStore, uniqueHexes} = await loadHexData(fileName);
+  
+  const hexLayer = createHexLayer(uniqueHexes, viewElement.map);
   viewElement.map.add(hexLayer);
   hexLayer.when(() => {
     viewElement.view.goTo(hexLayer.fullExtent.expand(1.15));
   })
 
-  await updateHexValues(hexLayer, hexStore);
+  await updateHexValues(hexLayer, hexStore, indicators_set);
 } 
 
 function clearCity() {

@@ -47,7 +47,7 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
     "region_pct_rank": 0.17423281073570251,
     "st_pct_rank": 0.3077784776687622,
     "type": "harm"
-}]) => {
+}], indicator_set) => {
     
   // Calculate average values for harms and assets
   //dynamic variable for division in case some entry is missing a harm/asset
@@ -58,10 +58,13 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
     let assetsCount = 0;
 
     let displayString = '';
+    
+    console.log(`INDICATOR SET: ${indicator_set}`)
     rows.forEach((row) => {
-        if (["tsunami_zone", "highway", "electric_transmission_lines"].includes(row.var)) {
-    return; // skip this iteration
-    }
+        if (indicator_set.has(row.var)) {
+
+        console.log(`YES!!: ${row.var}`)
+
 
 
 
@@ -80,11 +83,19 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
         }
     
 
-});
-    const avg_harms = (harmsValue / harmsCount);
-    const avg_assets = (assetsValue / assetsCount);
+} else{
+   
+} } );
+    let avg_harms = 0
+    if(harmsCount>0){
+    avg_harms = (harmsValue / harmsCount);
+    }
+    let avg_assets = 0
+    if(assetsCount>0){
+    avg_assets = (assetsValue / assetsCount);
+    }
 
-    // console.log(`Avg Harms: ${avg_harms}, Avg Assets: ${avg_assets}`);
+    console.log(`Avg Harms: ${avg_harms}, Avg Assets: ${avg_assets}`);
 
     const quartile_string = `${assignBin(avg_assets, fixed_thresholds)},${assignBin(avg_harms, fixed_thresholds)}`;
     

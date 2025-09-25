@@ -40,6 +40,7 @@ async function createPlaceElements(parentEl, cb) {
         return el;
     });
     els.forEach(el => parentEl.append(el));
+
     parentEl.addEventListener('calciteComboboxChange', () => {
         if (parentEl.selectedItems.length > 0) {
             const value = parentEl.selectedItems[0].value.replaceAll(/[ /]/g, "_").toLowerCase();
@@ -93,7 +94,7 @@ function createElementsHelper(_data, type, group){
    
 }
 
-async function createIndicatorElements(parentEl) {
+async function createIndicatorElements(parentEl, cb) {
     const { asyncBufferFromUrl, parquetQuery } = await import('hyparquet');
     const prefix = import.meta.env.VITE_PATH;
     const file = await asyncBufferFromUrl({ url: `${prefix}/harms_assets.parquet` });
@@ -109,8 +110,10 @@ async function createIndicatorElements(parentEl) {
     createElementsHelper(_data, 'harm', harmsGroup)
     parentEl.addEventListener('calciteComboboxChange', () => {
         if (parentEl.selectedItems.length > 0) {
-            const value = parentEl.selectedItems[0].value.replaceAll(/[ /]/g, "_").toLowerCase();
-            cb(value);
+            // Multiple selection
+            const selectedValues = parentEl.selectedItems.map(item => item.value);
+            console.log(selectedValues);
+            cb(selectedValues);
         } else {
             cb(null)
         }
@@ -119,3 +122,4 @@ async function createIndicatorElements(parentEl) {
 
 
 export { createPlaceElements, createIndicatorElements };
+

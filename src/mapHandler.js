@@ -14,7 +14,11 @@ import { calculateValue} from './calculate.js';
  * @param {string[]} uniqueHexes - Array of H3 hex IDs.
  * @returns {FeatureLayer} ArcGIS FeatureLayer ready to be added to the map.
  */
-export function createHexLayer(uniqueHexes) {
+export function createHexLayer(uniqueHexes, map) {
+  if (map){
+  const layersToRemove = map.layers.filter(layer => layer instanceof FeatureLayer);
+  layersToRemove.forEach(layer => map.layers.remove(layer));}
+
   const graphics = uniqueHexes.map(hex => {
     const polygon = { type: "polygon", rings: cellToBoundary(hex, true) };
     const fillSymbol = {
@@ -56,12 +60,12 @@ export function createHexLayer(uniqueHexes) {
  * @param {FeatureLayer} hexLayer - The FeatureLayer created by createHexLayer.
  * @param {Object<string, Object[]>} hexStore - Map of hex_id → array of data rows.
  */
-export async function updateHexValues(hexLayer, hexStore) {
+export async function updateHexValues(hexLayer, hexStore, indicator_set) {
 
   const results = await hexLayer.queryFeatures();
   const edits = results.features.map(feature => {
     const hexId = feature.getAttribute('hex_id');
-    const values = calculateValue('ugb_pct_rank', hexStore[hexId]);
+    const values = calculateValue('ugb_pct_rank', hexStore[hexId], indicator_set);
 
     feature.setAttribute('final_value_harms', values.avg_harms);
     feature.setAttribute('final_value_assets', values.avg_assets);

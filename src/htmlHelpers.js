@@ -5,121 +5,103 @@
 import { snappyUncompressor } from 'hysnappy';
 
 /**
- * Creates and appends `<calcite-combobox-item>` elements to a given parent element
- * based on place names loaded from a Parquet file (`places.parquet`).
- * 
- *
- *  * @param {HTMLElement} parentEl 
- *        The parent element ( a `<calcite-combobox>`) to which 
- *        `<calcite-combobox-item>` elements will be appended.
- * @param {Function} cb 
- *        A callback function invoked when the selection changes.
- *        Receives a `string` (normalized selected place name) or `null`.
- * @returns {Promise<void>} 
- *          Resolves when the place elements have been created and event listener is attached.
- * 
+ * Load and parse a Parquet file.
+ * @param {string} filename - The parquet filename (relative to VITE_PATH).
+ * @returns {Promise<Array<object>>} Parsed parquet data.
  */
-async function createPlaceElements(parentEl, cb) {
-    const { asyncBufferFromUrl, parquetQuery } = await import('hyparquet');
-    const prefix = import.meta.env.VITE_PATH;
-    const file = await asyncBufferFromUrl({ url: `${prefix}/places.parquet` });
-    const _data = await parquetQuery({
-        file,
-        compressors: { SNAPPY: snappyUncompressor() }
-    });
-
-    const place_names = _data.map(val => val.name).sort();
-    const els = place_names.map(place => {
-        // <calcite-combobox-item
-        //  value="Natural Resources"
-        //  heading="Natural Resources">
-        // </calcite-combobox-item>
-        const el = document.createElement('calcite-combobox-item');
-        el.setAttribute('value', place);
-        el.setAttribute('heading', place);
-        return el;
-    });
-    els.forEach(el => parentEl.append(el));
-
-    parentEl.addEventListener('calciteComboboxChange', () => {
-        if (parentEl.selectedItems.length > 0) {
-            const value = parentEl.selectedItems[0].value.replaceAll(/[ /]/g, "_").toLowerCase();
-            cb(value);
-        } else {
-            cb(null)
-        }
-    })
+async function loadParquet(filename) {
+  const { asyncBufferFromUrl, parquetQuery } = await import('hyparquet');
+  const prefix = import.meta.env.VITE_PATH;
+  const file = await asyncBufferFromUrl({ url: `${prefix}/${filename}` });
+  return parquetQuery({
+    file,
+    compressors: { SNAPPY: snappyUncompressor() }
+  });
 }
 
+/**
+ * Create <calcite-combobox-item> elements from an array of strings.
+ * @param {HTMLElement} parentEl - The element to append items to.
+ * @param {string[]} values - The list of values/headings.
+ */
+function appendComboboxItems(parentEl, values) {
+  values.sort().forEach(val => {
+    const el = document.createElement('calcite-combobox-item');
+    el.setAttribute('value', val);
+    el.setAttribute('heading', val);
+    parentEl.append(el);
+  });
+}
 
+/**
+ * Attach a change listener to a combobox.
+ * @param {HTMLElement} parentEl - The combobox element.
+ * @param {Function} cb - Callback for selection change.
+ * @param {object} options
+ * @param {boolean} [options.multi=false] - Whether multiple selection is allowed.
+ * @param {boolean} [options.normalize=false] - Whether to normalize single values.
+ */
+function attachComboboxListener(parentEl, cb, { multi = false, normalize = false } = {}) {
+  parentEl.addEventListener('calciteComboboxChange', () => {
+    if (parentEl.selectedItems.length > 0) {
+      let values = parentEl.selectedItems.map(item => item.value);
+      if (!multi) {
+        values = values[0];
+        if (normalize && values) {
+          values = values.replaceAll(/[ /]/g, "_").toLowerCase();
+        }
+      }
+      cb(values);
+    } else {
+      cb(null);
+    }
+  });
+}
 
+/**
+ * Creates and appends `<calcite-combobox-item>` elements to a given parent element
+ * based on place names loaded from a Parquet file (`places.parquet`).
+ *
+ * @param {HTMLElement} parentEl - The `<calcite-combobox>` container.
+ * @param {Function} cb - Callback receiving the selected place string or null.
+ */
+export async function createPlaceElements(parentEl, cb) {
+  const data = await loadParquet('places.parquet');
+  const placeNames = data.map(d => d.name);
+  appendComboboxItems(parentEl, placeNames);
+  attachComboboxListener(parentEl, cb, { multi: false, normalize: true });
+}
+
+/**
+ * Creates and appends `<calcite-combobox-item>` elements grouped as harms/assets
+ * based on data from `harms_assets.parquet`.
+ *
+ * @param {HTMLElement} parentEl - The `<calcite-combobox>` container.
+ * @param {Function} cb - Callback receiving array of selected values or null.
+ */
+export async function createIndicatorElements(parentEl, cb) {
+  const data = await loadParquet('harms_assets.parquet');
+
+  const harmsGroup = parentEl.querySelector('calcite-combobox-item-group[label="Harms"]');
+  const assetsGroup = parentEl.querySelector('calcite-combobox-item-group[label="Assets"]');
+
+  appendComboboxItems(assetsGroup, data.filter(d => d.type === 'asset').map(d => d.value));
+  appendComboboxItems(harmsGroup, data.filter(d => d.type === 'harm').map(d => d.value));
+
+  attachComboboxListener(parentEl, cb, { multi: true });
+}
 
 
 /**
- * Loads indicator data from a Parquet file (`harms_assets.parquet`).
- * 
- * Currently this function only loads and parses the Parquet data, but does not yet
- * generate or append UI elements. Intended for future extension to populate 
- * indicator-related controls.
- *
- * @async
- * @function createIndicatorElements
- * @param {HTMLElement} parentEl 
- *        The parent element where indicator elements will eventually be appended.
- * @returns {Promise<void>} 
- *          Resolves once the Parquet data has been loaded.
+ * Attach a listener to a calcite-radio-button-group
+ * @param {string|HTMLElement} selectorOrEl - ID selector or element
+ * @param {Function} cb - Callback receiving selected value
  */
+export function attachRadioListener(radioGroup, callback) {
+  if (!radioGroup) return; // safety check
 
-
-function createElementsHelper(_data, type, group){
-    const filtered = _data.filter(d => d.type === type);
-
-    const var_names = filtered.map(val => val.value).sort(); 
-      // find the groups inside the combobox
-    
-
-
-    const els = var_names.map(vals => {
-        // <calcite-combobox-item
-        //  value="Natural Resources"
-        //  heading="Natural Resources">
-        // </calcite-combobox-item>
-        const el = document.createElement('calcite-combobox-item');
-        el.setAttribute('value', vals);
-        el.setAttribute('heading', vals);
-        return el;
-    });
-    els.forEach(el => {
-        group.append(el)});
-   
+  radioGroup.addEventListener("calciteRadioButtonGroupChange", () => {
+    const selectedValue = radioGroup.value;
+    callback(selectedValue);
+  });
 }
-
-async function createIndicatorElements(parentEl, cb) {
-    const { asyncBufferFromUrl, parquetQuery } = await import('hyparquet');
-    const prefix = import.meta.env.VITE_PATH;
-    const file = await asyncBufferFromUrl({ url: `${prefix}/harms_assets.parquet` });
-    const _data = await parquetQuery({
-        file,
-        compressors: { SNAPPY: snappyUncompressor() }
-    });
-    console.log(_data)
-
-    const harmsGroup = parentEl.querySelector('calcite-combobox-item-group[label="Harms"]');
-    const assetsGroup = parentEl.querySelector('calcite-combobox-item-group[label="Assets"]');
-    createElementsHelper(_data, "asset", assetsGroup)
-    createElementsHelper(_data, 'harm', harmsGroup)
-    parentEl.addEventListener('calciteComboboxChange', () => {
-        if (parentEl.selectedItems.length > 0) {
-            // Multiple selection
-            const selectedValues = parentEl.selectedItems.map(item => item.value);
-            console.log(selectedValues);
-            cb(selectedValues);
-        } else {
-            cb(null)
-        }
-    })
-}
-
-
-export { createPlaceElements, createIndicatorElements };
-

@@ -59,14 +59,8 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
 
     let displayString = '';
     
-    console.log(`INDICATOR SET: ${indicator_set}`)
     rows.forEach((row) => {
         if (indicator_set.has(row.var)) {
-
-        console.log(`YES!!: ${row.var}`)
-
-
-
 
         if (row.type==='harm') {
             const quartileValue = assignBin(row[field], fixed_thresholds);
@@ -95,7 +89,6 @@ const calculateValue = (field = 'ugb_pct_rank', rows = [{
     avg_assets = (assetsValue / assetsCount);
     }
 
-    console.log(`Avg Harms: ${avg_harms}, Avg Assets: ${avg_assets}`);
 
     const quartile_string = `${assignBin(avg_assets, fixed_thresholds)},${assignBin(avg_harms, fixed_thresholds)}`;
     
